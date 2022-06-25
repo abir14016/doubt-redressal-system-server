@@ -16,7 +16,15 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         await client.connect();
-        console.log("database connected")
+        const doubtCollection = client.db('xetGo_solver').collection('doubts');
+
+        //load all doubts from database
+        app.get('/doubt', async (req, res) => {
+            const query = {};
+            const cursor = doubtCollection.find(query);
+            const doubts = await cursor.toArray();
+            res.send(doubts);
+        });
     }
     finally {
 
