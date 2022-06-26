@@ -25,6 +25,13 @@ async function run() {
             const doubts = await cursor.toArray();
             res.send(doubts);
         });
+
+        //send doubt to database by student
+        app.post('/doubt', async (req, res) => {
+            const doubt = req.body;
+            const result = await doubtCollection.insertOne(doubt);
+            res.send(result);
+        })
     }
     finally {
 
