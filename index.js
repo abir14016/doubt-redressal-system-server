@@ -18,6 +18,7 @@ async function run() {
         await client.connect();
         const doubtCollection = client.db('xetGo_solver').collection('doubts');
         const commentCollection = client.db('xetGo_solver').collection('comments');
+        // const userCollection = client.db('xetGo_solver').collection('users');
 
         //load all doubts from database
         app.get('/doubt', async (req, res) => {
@@ -27,12 +28,34 @@ async function run() {
             res.send(doubts);
         });
 
+
+        //load all specific from database
+        app.get('/doubt/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const doubt = await doubtCollection.findOne(query);
+            res.send(doubt);
+        });
+
+
         //send doubt to database by student
         app.post('/doubt', async (req, res) => {
             const doubt = req.body;
             const result = await doubtCollection.insertOne(doubt);
             res.send(result);
         });
+
+        app.put('/doubt/:id', async (req, res) => {
+            const id = req.params.id;
+            const doubt = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: doubt,
+            };
+            const result = await doubtCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        })
 
         //load all comments from database
         app.get('/comment', async (req, res) => {
@@ -57,6 +80,23 @@ async function run() {
             const result = await commentCollection.insertOne(comment);
             res.send(result);
         });
+
+
+        // // upsert userCollection
+        // app.put('/user/:email', async (req, res) => {
+        //     const email = req.params.email;
+        //     const user = req.body;
+        //     const filter = { email: email };
+        //     const options = { upsert: true };
+        //     const updatedDoc = {
+        //         $set: user,
+        //     };
+        //     const result = await userCollection.updateOne(filter, updatedDoc, options);
+        //     const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, {
+        //         expiresIn: '10d'
+        //     });
+        //     res.send({ result, token });
+        // });
 
     }
     finally {
