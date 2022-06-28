@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
@@ -18,7 +19,7 @@ async function run() {
         await client.connect();
         const doubtCollection = client.db('xetGo_solver').collection('doubts');
         const commentCollection = client.db('xetGo_solver').collection('comments');
-        // const userCollection = client.db('xetGo_solver').collection('users');
+        const userCollection = client.db('xetGo_solver').collection('users');
 
         //load all doubts from database
         app.get('/doubt', async (req, res) => {
@@ -82,21 +83,21 @@ async function run() {
         });
 
 
-        // // upsert userCollection
-        // app.put('/user/:email', async (req, res) => {
-        //     const email = req.params.email;
-        //     const user = req.body;
-        //     const filter = { email: email };
-        //     const options = { upsert: true };
-        //     const updatedDoc = {
-        //         $set: user,
-        //     };
-        //     const result = await userCollection.updateOne(filter, updatedDoc, options);
-        //     const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, {
-        //         expiresIn: '10d'
-        //     });
-        //     res.send({ result, token });
-        // });
+        // upsert userCollection
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updatedDoc, options);
+            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: '10d'
+            });
+            res.send({ result, token });
+        });
 
     }
     finally {
