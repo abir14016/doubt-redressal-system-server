@@ -125,32 +125,21 @@ async function run() {
 
 
         //onlyteacher api
-        app.get('/teacher/:email', async (req, res) => {
+        app.get('/teacher/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
             const user = await userCollection.findOne({ email: email });
-            const isTeacher = user.role === 'teacher';
+            const isTeacher = user?.role === 'teacher';
             res.send({ teacher: isTeacher })
         });
 
 
         // onlySthudent api
-        app.get('/student/:email', async (req, res) => {
+        app.get('/student/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
             const user = await userCollection.findOne({ email: email });
-            const isStudent = user.role === 'student';
+            const isStudent = user?.role === 'student';
             res.send({ student: isStudent })
         });
-
-
-
-        //load user based on email
-        // app.get('/user/:email', async (req, res) => {
-        //     const email = req.params.email;
-        //     const query = { email: email };
-        //     const cursor = userCollection.findOne(query);
-        //     const user = await cursor.toArray();
-        //     return res.send(user);
-        // });
 
     }
     finally {
